@@ -6,7 +6,11 @@ import Register from './login/register';
 import CreateTrip from './trips/CreateTrip';
 import TripList from './trips/TripList';
 import TripDetail from './trips/TripDetail';
+import MyTrips from './trips/MyTrips';
 import RequireAuth from './RequireAuth';
+import EditTrip from './trips/EditTrip';
+
+
 
 function App() {
   return (
@@ -23,6 +27,11 @@ function App() {
         <Route path="/trips/:id" element={
           <RequireAuth><TripDetail /></RequireAuth>
         } />
+        <Route path="/my-trips" element={
+          <RequireAuth><MyTrips /></RequireAuth>
+        } />
+        <Route path="/trips/:id/edit" element={<EditTrip />} />
+
       </Routes>
     </Router>
   );

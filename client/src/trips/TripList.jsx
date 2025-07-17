@@ -40,6 +40,11 @@ function TripList() {
   return (
     <div>
       <h2>All Trips</h2>
+      <div style={{ marginBottom: '1rem' }}>
+        <Link to="/my-trips">
+            <button>My Trips</button>
+        </Link>
+    </div>
 
       {/* ✅ Create Trip Button */}
       <div style={{ marginBottom: '1rem' }}>

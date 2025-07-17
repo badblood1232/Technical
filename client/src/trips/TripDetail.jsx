@@ -41,6 +41,11 @@ function TripDetail() {
 
   return (
     <div>
+      {/* ✅ Back Button */}
+      <Link to="/trips">
+        <button style={{ marginBottom: '1rem' }}>← Back to Trip List</button>
+      </Link>
+
       <h2>{trip.title}</h2>
       <p>{trip.briefer}</p>
       <img src={trip.cover_photo} alt={trip.title} style={{ width: '100%', maxHeight: '300px', objectFit: 'cover' }} />
@@ -57,8 +62,6 @@ function TripDetail() {
       )}
 
       {message && <p>{message}</p>}
-
-      <p><Link to="/trips">Back to Trip List</Link></p>
     </div>
   );
 }
