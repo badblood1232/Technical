@@ -33,6 +33,7 @@ function Register () {
         formData.append("username", data.username);
         formData.append("mantra", data.mantra);
         formData.append("email", data.email);
+        formData.append("photo", data.photo);
         formData.append("password", data.password);
         formData.append("photo_path", data.photo?.name || "");
 

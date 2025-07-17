@@ -17,11 +17,16 @@ const computeTripStatus = (trip) => {
 
 router.get('/', async (req, res) => {
   try {
-    const [trips] = await db.query("SELECT * FROM trips ORDER BY start_time DESC");
+    const [trips] = await db.query(`
+      SELECT trips.*, users.username AS host_name, users.photo_path AS host_photo
+      FROM trips
+      JOIN users ON trips.host_id = users.id
+      ORDER BY trips.start_time DESC
+    `);
 
     const tripsWithStatus = trips.map((trip) => ({
       ...trip,
-      status: computeTripStatus(trip)
+      status: computeTripStatus(trip),
     }));
 
     res.json(tripsWithStatus);
@@ -29,6 +34,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 router.get('/my', async (req, res) => {
@@ -61,7 +67,12 @@ router.get('/my', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const tripId = req.params.id;
   try {
-    const [rows] = await db.query("SELECT * FROM trips WHERE id = ?", [tripId]);
+    const [rows] = await db.query(`
+      SELECT trips.*, users.username AS host_name, users.photo_path AS host_photo
+      FROM trips
+      JOIN users ON trips.host_id = users.id
+      WHERE trips.id = ?
+    `, [tripId]);
 
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Trip not found' });
@@ -75,6 +86,8 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+
 
 router.post('/', async (req, res) => {
   try {
