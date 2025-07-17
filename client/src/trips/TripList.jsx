@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import LogoutButton from '../component/LogoutButton';
 
 function TripList() {
   const [trips, setTrips] = useState([]);
@@ -52,6 +53,7 @@ function TripList() {
           <button style={{ padding: '0.5rem 1rem' }}>+ Add Trip</button>
         </Link>
       </div>
+      <LogoutButton />
 
       {message && <p>{message}</p>}
 
