@@ -12,6 +12,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+@import 'leaflet/dist/leaflet.css';
 
 a {
   font-weight: 500;

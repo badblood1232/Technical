@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import MapPicker from '../component/MapPicker';
 
 function CreateTrip() {
   const [tripData, setTripData] = useState({
@@ -21,6 +22,10 @@ function CreateTrip() {
 
   const handleChange = (e) => {
     setTripData({ ...tripData, [e.target.name]: e.target.value });
+  };
+
+  const handleLocationChange = ({ latitude, longitude }) => {
+    setTripData((prev) => ({ ...prev, latitude, longitude }));
   };
 
   const handleSubmit = async (e) => {
@@ -53,8 +58,17 @@ function CreateTrip() {
         <textarea name="briefer" placeholder="Briefer" value={tripData.briefer} onChange={handleChange} required /><br />
         <input name="cover_photo" placeholder="Cover Photo URL" value={tripData.cover_photo} onChange={handleChange} required /><br />
         <input name="destination_name" placeholder="Destination Name" value={tripData.destination_name} onChange={handleChange} required /><br />
-        <input name="latitude" placeholder="Latitude" value={tripData.latitude} onChange={handleChange} /><br />
-        <input name="longitude" placeholder="Longitude" value={tripData.longitude} onChange={handleChange} /><br />
+
+      
+        <label>Pick Location on Map:</label>
+        <MapPicker
+          latitude={parseFloat(tripData.latitude) || 14.5995}
+          longitude={parseFloat(tripData.longitude) || 120.9842}
+          onChange={handleLocationChange}
+        />
+        <p>Selected Latitude: {tripData.latitude}</p>
+        <p>Selected Longitude: {tripData.longitude}</p>
+
         <label>Start Time:</label>
         <input name="start_time" type="datetime-local" value={tripData.start_time} onChange={handleChange} required /><br />
         <label>End Time:</label>

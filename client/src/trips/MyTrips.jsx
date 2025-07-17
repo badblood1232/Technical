@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import CancelTripButton from './CancelTripButton';
+import CancelTripButton from '../component/CancelTripButton';
 
 function MyTrips() {
   const [trips, setTrips] = useState([]);

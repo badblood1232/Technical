@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import MapEmbed from '../component/MapEmbed'; 
 
 function TripDetail() {
   const { id } = useParams();
@@ -41,7 +42,7 @@ function TripDetail() {
 
   return (
     <div>
-      {/* ✅ Back Button */}
+   
       <Link to="/trips">
         <button style={{ marginBottom: '1rem' }}>← Back to Trip List</button>
       </Link>
@@ -51,6 +52,7 @@ function TripDetail() {
       <img src={trip.cover_photo} alt={trip.title} style={{ width: '100%', maxHeight: '300px', objectFit: 'cover' }} />
       <p><strong>Destination:</strong> {trip.destination_name}</p>
       <p><strong>Coordinates:</strong> {trip.latitude}, {trip.longitude}</p>
+      <MapEmbed latitude={trip.latitude} longitude={trip.longitude} />
       <p><strong>Dates:</strong> {new Date(trip.start_time).toLocaleString()} - {new Date(trip.end_time).toLocaleString()}</p>
       <p><strong>Status:</strong> {trip.status}</p>
       <p><strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}</p>
