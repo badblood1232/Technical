@@ -2,6 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import LogoutButton from '../component/LogoutButton';
+import MapEmbed from '../component/MapEmbed';
+import {
+  Box,
+  Typography,
+  Button,
+  Avatar,
+  Card,
+  CardContent,
+  CardMedia,
+  Grid,
+  Alert,
+  Paper,
+  Stack
+} from '@mui/material';
 
 function TripList() {
   const [trips, setTrips] = useState([]);
@@ -17,7 +31,6 @@ function TripList() {
         setMessage('Failed to load trips');
       }
     };
-
     fetchTrips();
   }, []);
 
@@ -39,56 +52,103 @@ function TripList() {
   };
 
   return (
-    <div>
-      <h2>All Trips</h2>
-      <div style={{ marginBottom: '1rem' }}>
-        <Link to="/my-trips">
-            <button>My Trips</button>
-        </Link>
-    </div>
+    <Box sx={{ padding: 4, bgcolor: '#f9f9f9', minHeight: '100vh' }}>
+      <Paper sx={{ padding: 3, mb: 3 }}>
+        <Typography variant="h4" gutterBottom>
+          All Trips
+        </Typography>
 
+        <Stack direction="row" spacing={2} mb={2}>
+          <Button component={Link} to="/my-trips" variant="outlined">
+            My Trips
+          </Button>
+          <Button component={Link} to="/create-trip" variant="contained">
+            + Add Trip
+          </Button>
+          <LogoutButton />
+        </Stack>
 
-      <div style={{ marginBottom: '1rem' }}>
-        <Link to="/create-trip">
-          <button style={{ padding: '0.5rem 1rem' }}>+ Add Trip</button>
-        </Link>
-      </div>
-      <LogoutButton />
+        {message && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            {message}
+          </Alert>
+        )}
 
-      {message && <p>{message}</p>}
+        <Grid container spacing={3}>
+          {trips.map((trip) => (
+            <Grid item xs={12} md={6} lg={4} key={trip.id}>
+              <Card>
+                {trip.cover_photo && (
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    image={trip.cover_photo}
+                    alt={trip.title}
+                  />
+                )}
+                <CardContent>
+                  <Box display="flex" alignItems="center" mb={1}>
+                    {trip.host_photo && (
+                      <Avatar
+                        src={`http://localhost:3001/${trip.photo_path}`}
+                        alt="Host"
+                        sx={{ width: 40, height: 40, mr: 1 }}
+                      />
+                    )}
+                    <Typography variant="body2" fontStyle="italic">
+                      Hosted by: {trip.host_name || 'Unknown'}
+                    </Typography>
+                  </Box>
 
-      {trips.map((trip) => (
-<div key={trip.id} style={{ border: '1px solid #ccc', margin: '1rem 0', padding: '1rem' }}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-  {trip.host_photo && (
-    <img
-      src={`http://localhost:3001/${trip.photo_path}`}
-      alt="Host Avatar"
-      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
-    />
-  )}
-  <span style={{ fontStyle: 'italic' }}>Hosted by: {trip.host_name || 'Unknown'} and {trip.photo_path} </span>
-</div>
+                  <Typography variant="h6" component={Link} to={`/trips/${trip.id}`} style={{ textDecoration: 'none', color: '#1976d2' }}>
+                    {trip.title}
+                  </Typography>
 
-  <h3>
-    <Link to={`/trips/${trip.id}`}>{trip.title}</Link>
-  </h3>
-  <p>{trip.briefer}</p>
-  <img src={trip.cover_photo} alt={trip.title} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }} />
-  <p><strong>Destination:</strong> {trip.destination_name}</p>
-  <p><strong>Dates:</strong> {new Date(trip.start_time).toLocaleString()} - {new Date(trip.end_time).toLocaleString()}</p>
-  <p><strong>Status:</strong> {trip.status}</p>
-  <p><strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}</p>
-  {trip.status === 'Upcoming' && trip.current_heads < trip.max_heads ? (
-    <button onClick={() => handleJoin(trip.id)}>Join</button>
-  ) : (
-    <button disabled>{trip.status === 'Full' ? 'Full' : 'Closed'}</button>
-  )}
-</div>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    {trip.briefer}
+                  </Typography>
 
-))}
+                  <Typography variant="body2">
+                    <strong>Destination:</strong> {trip.destination_name}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Dates:</strong>{' '}
+                    {new Date(trip.start_time).toLocaleString()} –{' '}
+                    {new Date(trip.end_time).toLocaleString()}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Status:</strong> {trip.status}
+                  </Typography>
+                  <Typography variant="body2" gutterBottom>
+                    <strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}
+                  </Typography>
 
-    </div>
+                 
+                  <MapEmbed latitude={trip.latitude} longitude={trip.longitude} />
+
+                  <Box mt={2}>
+                    {trip.status === 'Upcoming' && trip.current_heads < trip.max_heads ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={() => handleJoin(trip.id)}
+                      >
+                        Join
+                      </Button>
+                    ) : (
+                      <Button variant="outlined" disabled fullWidth>
+                        {trip.status === 'Full' ? 'Full' : 'Closed'}
+                      </Button>
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Paper>
+    </Box>
   );
 }
 

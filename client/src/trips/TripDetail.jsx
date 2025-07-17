@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import MapEmbed from '../component/MapEmbed'; 
+import MapEmbed from '../component/MapEmbed';
+import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Alert,
+  Paper,
+  Stack
+} from '@mui/material';
 
 function TripDetail() {
   const { id } = useParams();
@@ -25,7 +36,10 @@ function TripDetail() {
   const handleJoin = async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) return setMessage('Please log in to join this trip.');
+      if (!token) {
+        setMessage('Please log in to join this trip.');
+        return;
+      }
 
       await axios.post(`http://localhost:3001/api/trips/${id}/join`, {}, {
         headers: { Authorization: `Bearer ${token}` }
@@ -38,33 +52,77 @@ function TripDetail() {
     }
   };
 
-  if (!trip) return <p>{message || 'Loading trip...'}</p>;
+  if (!trip) {
+    return (
+      <Box p={4}>
+        <Typography variant="body1">
+          {message || 'Loading trip...'}
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
-    <div>
-   
-      <Link to="/trips">
-        <button style={{ marginBottom: '1rem' }}>← Back to Trip List</button>
-      </Link>
+    <Box sx={{ padding: 4, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+      <Paper sx={{ padding: 3, maxWidth: 800, margin: '0 auto' }}>
+        <Stack direction="row" spacing={2} mb={2}>
+          <Button component={Link} to="/trips" variant="outlined">
+            ← Back to Trip List
+          </Button>
+        </Stack>
 
-      <h2>{trip.title}</h2>
-      <p>{trip.briefer}</p>
-      <img src={trip.cover_photo} alt={trip.title} style={{ width: '100%', maxHeight: '300px', objectFit: 'cover' }} />
-      <p><strong>Destination:</strong> {trip.destination_name}</p>
-      <p><strong>Coordinates:</strong> {trip.latitude}, {trip.longitude}</p>
-      <MapEmbed latitude={trip.latitude} longitude={trip.longitude} />
-      <p><strong>Dates:</strong> {new Date(trip.start_time).toLocaleString()} - {new Date(trip.end_time).toLocaleString()}</p>
-      <p><strong>Status:</strong> {trip.status}</p>
-      <p><strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}</p>
+        <Typography variant="h4" gutterBottom>
+          {trip.title}
+        </Typography>
 
-      {trip.status === 'Upcoming' && trip.current_heads < trip.max_heads ? (
-        <button onClick={handleJoin}>Join Trip</button>
-      ) : (
-        <button disabled>{trip.status === 'Full' ? 'Full' : 'Closed'}</button>
-      )}
+        <Typography variant="body1" color="text.secondary" mb={2}>
+          {trip.briefer}
+        </Typography>
 
-      {message && <p>{message}</p>}
-    </div>
+        {trip.cover_photo && (
+          <CardMedia
+            component="img"
+            height="300"
+            image={trip.cover_photo}
+            alt={trip.title}
+            sx={{ objectFit: 'cover', borderRadius: 1, mb: 2 }}
+          />
+        )}
+
+        <CardContent>
+          <Typography variant="body1"><strong>Destination:</strong> {trip.destination_name}</Typography>
+          <Typography variant="body1"><strong>Coordinates:</strong> {trip.latitude}, {trip.longitude}</Typography>
+          <Typography variant="body1">
+            <strong>Dates:</strong> {new Date(trip.start_time).toLocaleString()} – {new Date(trip.end_time).toLocaleString()}
+          </Typography>
+          <Typography variant="body1"><strong>Status:</strong> {trip.status}</Typography>
+          <Typography variant="body1" mb={2}>
+            <strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}
+          </Typography>
+
+          {/* Embedded Map */}
+          <MapEmbed latitude={trip.latitude} longitude={trip.longitude} />
+
+          <Box mt={3}>
+            {trip.status === 'Upcoming' && trip.current_heads < trip.max_heads ? (
+              <Button variant="contained" fullWidth onClick={handleJoin}>
+                Join Trip
+              </Button>
+            ) : (
+              <Button variant="outlined" fullWidth disabled>
+                {trip.status === 'Full' ? 'Full' : 'Closed'}
+              </Button>
+            )}
+          </Box>
+
+          {message && (
+            <Alert severity="info" sx={{ mt: 2 }}>
+              {message}
+            </Alert>
+          )}
+        </CardContent>
+      </Paper>
+    </Box>
   );
 }
 

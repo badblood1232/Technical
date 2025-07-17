@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import {
+  Box,
+  Paper,
+  TextField,
+  Typography,
+  Button,
+  Alert,
+  Stack
+} from '@mui/material';
 
 function CreateTrip() {
   const [tripData, setTripData] = useState({
@@ -18,6 +27,7 @@ function CreateTrip() {
 
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
 
   const handleChange = (e) => {
     setTripData({ ...tripData, [e.target.name]: e.target.value });
@@ -26,46 +36,183 @@ function CreateTrip() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
+    setIsError(false);
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:3001/api/trips', tripData, {
+      await axios.post('http://localhost:3001/api/trips', tripData, {
         headers: { Authorization: `Bearer ${token}` }
       });
+
       setMessage('Trip created successfully!');
       setTripData({
-        title: '', briefer: '', cover_photo: '', destination_name: '',
-        latitude: '', longitude: '', start_time: '', end_time: '',
-        min_heads: '', max_heads: ''
+        title: '',
+        briefer: '',
+        cover_photo: '',
+        destination_name: '',
+        latitude: '',
+        longitude: '',
+        start_time: '',
+        end_time: '',
+        min_heads: '',
+        max_heads: ''
       });
-      navigate('/trips');
+
+      setTimeout(() => navigate('/trips'), 1000);
     } catch (err) {
       console.error(err);
       setMessage(err.response?.data?.message || 'Trip creation failed');
+      setIsError(true);
     }
   };
 
+
+
   return (
-    <div>
-      <h2>Create a New Trip</h2>
-      <form onSubmit={handleSubmit}>
-        <input name="title" placeholder="Title" value={tripData.title} onChange={handleChange} required /><br />
-        <textarea name="briefer" placeholder="Briefer" value={tripData.briefer} onChange={handleChange} required /><br />
-        <input name="cover_photo" placeholder="Cover Photo URL" value={tripData.cover_photo} onChange={handleChange} required /><br />
-        <input name="destination_name" placeholder="Destination Name" value={tripData.destination_name} onChange={handleChange} required /><br />
-        <input name="latitude" placeholder="Latitude" value={tripData.latitude} onChange={handleChange} /><br />
-        <input name="longitude" placeholder="Longitude" value={tripData.longitude} onChange={handleChange} /><br />
-        <label>Start Time:</label>
-        <input name="start_time" type="datetime-local" value={tripData.start_time} onChange={handleChange} required /><br />
-        <label>End Time:</label>
-        <input name="end_time" type="datetime-local" value={tripData.end_time} onChange={handleChange} required /><br />
-        <input name="min_heads" type="number" placeholder="Min Participants" value={tripData.min_heads} onChange={handleChange} required /><br />
-        <input name="max_heads" type="number" placeholder="Max Participants" value={tripData.max_heads} onChange={handleChange} required /><br />
-        <button type="submit">Create Trip</button>
-      </form>
-      {message && <p>{message}</p>}
-    </div>
+    <Box sx={{ padding: 4, minHeight: '100vh', bgcolor: '#f5f5f5' }}>
+      <Paper sx={{ maxWidth: 600, mx: 'auto', p: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Create a New Trip
+        </Typography>
+
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Title"
+            name="title"
+            fullWidth
+            required
+            margin="normal"
+            value={tripData.title}
+            onChange={handleChange}
+          />
+
+          <TextField
+            label="Briefer"
+            name="briefer"
+            multiline
+            rows={3}
+            fullWidth
+            required
+            margin="normal"
+            value={tripData.briefer}
+            onChange={handleChange}
+          />
+
+          <TextField
+            label="Cover Photo URL"
+            name="cover_photo"
+            fullWidth
+            required
+            margin="normal"
+            value={tripData.cover_photo}
+            onChange={handleChange}
+          />
+
+          <TextField
+            label="Destination Name"
+            name="destination_name"
+            fullWidth
+            required
+            margin="normal"
+            value={tripData.destination_name}
+            onChange={handleChange}
+          />
+
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              label="Latitude"
+              name="latitude"
+              fullWidth
+              margin="normal"
+              value={tripData.latitude}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Longitude"
+              name="longitude"
+              fullWidth
+              margin="normal"
+              value={tripData.longitude}
+              onChange={handleChange}
+            />
+          </Stack>
+
+          <TextField
+            label="Start Time"
+            name="start_time"
+            type="datetime-local"
+            fullWidth
+            required
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            value={tripData.start_time}
+            onChange={handleChange}
+          />
+
+          <TextField
+            label="End Time"
+            name="end_time"
+            type="datetime-local"
+            fullWidth
+            required
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            value={tripData.end_time}
+            onChange={handleChange}
+          />
+
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              label="Min Participants"
+              name="min_heads"
+              type="number"
+              fullWidth
+              required
+              margin="normal"
+              value={tripData.min_heads}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Max Participants"
+              name="max_heads"
+              type="number"
+              fullWidth
+              required
+              margin="normal"
+              value={tripData.max_heads}
+              onChange={handleChange}
+            />
+          </Stack>
+
+          <Button
+            variant="contained"
+            type="submit"
+            fullWidth
+            sx={{ mt: 3 }}
+          >
+            Create Trip
+          </Button>
+
+          <Button
+            variant="outlined"
+            fullWidth
+            component={Link}
+            to="/trips"
+            sx={{ mt: 2 }}
+          >
+            Back
+          </Button>
+        </form>
+
+        {message && (
+          <Alert severity={isError ? 'error' : 'success'} sx={{ mt: 2 }}>
+            {message}
+          </Alert>
+        )}
+      </Paper>
+    </Box>
   );
 }
 
 export default CreateTrip;
+

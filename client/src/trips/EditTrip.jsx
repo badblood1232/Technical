@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import {
+  Box,
+  TextField,
+  Typography,
+  Button,
+  Paper,
+  Stack,
+  Alert
+} from '@mui/material';
 
 function EditTrip() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [trip, setTrip] = useState(null);
   const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -19,6 +29,7 @@ function EditTrip() {
         };
         setTrip(formatted);
       } catch (err) {
+        setIsError(true);
         setMessage('Failed to fetch trip');
       }
     };
@@ -31,6 +42,8 @@ function EditTrip() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsError(false);
+    setMessage('');
     try {
       const token = localStorage.getItem('token');
       await axios.put(`http://localhost:3001/api/trips/${id}`, trip, {
@@ -38,43 +51,157 @@ function EditTrip() {
       });
       navigate(`/trips/${id}`);
     } catch (err) {
+      setIsError(true);
       setMessage(err.response?.data?.message || 'Update failed');
     }
   };
 
-  if (!trip) return <p>{message || 'Loading...'}</p>;
+  if (!trip) {
+    return (
+      <Box p={4}>
+        <Typography variant="body1">{message || 'Loading trip data...'}</Typography>
+      </Box>
+    );
+  }
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-      <h2>Edit Trip</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <input name="title" value={trip.title} onChange={handleChange} placeholder="Title" required />
-        <textarea name="briefer" value={trip.briefer} onChange={handleChange} placeholder="Brief Description" rows={3} required />
-        <input name="cover_photo" value={trip.cover_photo} onChange={handleChange} placeholder="Image URL" />
-        <input name="destination_name" value={trip.destination_name} onChange={handleChange} placeholder="Destination Name" required />
-        <input name="latitude" value={trip.latitude} onChange={handleChange} placeholder="Latitude" required />
-        <input name="longitude" value={trip.longitude} onChange={handleChange} placeholder="Longitude" required />
+    <Box sx={{ padding: 4, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+      <Paper sx={{ maxWidth: 600, mx: 'auto', p: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Edit Trip
+        </Typography>
 
-        <label>
-          Start Date & Time:
-          <input type="datetime-local" name="start_time" value={trip.start_time} onChange={handleChange} required />
-        </label>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Title"
+            name="title"
+            fullWidth
+            required
+            margin="normal"
+            value={trip.title}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Brief Description"
+            name="briefer"
+            multiline
+            rows={3}
+            fullWidth
+            required
+            margin="normal"
+            value={trip.briefer}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Cover Photo URL"
+            name="cover_photo"
+            fullWidth
+            margin="normal"
+            value={trip.cover_photo}
+            onChange={handleChange}
+          />
+          <TextField
+            label="Destination Name"
+            name="destination_name"
+            fullWidth
+            required
+            margin="normal"
+            value={trip.destination_name}
+            onChange={handleChange}
+          />
+          <Stack direction="row" spacing={2}>
+            <TextField
+              label="Latitude"
+              name="latitude"
+              fullWidth
+              required
+              margin="normal"
+              value={trip.latitude}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Longitude"
+              name="longitude"
+              fullWidth
+              required
+              margin="normal"
+              value={trip.longitude}
+              onChange={handleChange}
+            />
+          </Stack>
 
-        <label>
-          End Date & Time:
-          <input type="datetime-local" name="end_time" value={trip.end_time} onChange={handleChange} required />
-        </label>
+          <TextField
+            label="Start Time"
+            name="start_time"
+            type="datetime-local"
+            fullWidth
+            required
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            value={trip.start_time}
+            onChange={handleChange}
+          />
+          <TextField
+            label="End Time"
+            name="end_time"
+            type="datetime-local"
+            fullWidth
+            required
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            value={trip.end_time}
+            onChange={handleChange}
+          />
+          <Stack direction="row" spacing={2}>
+            <TextField
+              label="Minimum Participants"
+              name="min_heads"
+              type="number"
+              fullWidth
+              required
+              margin="normal"
+              value={trip.min_heads}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Maximum Participants"
+              name="max_heads"
+              type="number"
+              fullWidth
+              required
+              margin="normal"
+              value={trip.max_heads}
+              onChange={handleChange}
+            />
+          </Stack>
 
-        <input name="min_heads" value={trip.min_heads} onChange={handleChange} placeholder="Minimum Participants" required />
-        <input name="max_heads" value={trip.max_heads} onChange={handleChange} placeholder="Maximum Participants" required />
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ mt: 3 }}
+          >
+            Save Changes
+          </Button>
+        </form>
 
-        <button type="submit">Save Changes</button>
-      </form>
+        {message && (
+          <Alert severity={isError ? 'error' : 'success'} sx={{ mt: 2 }}>
+            {message}
+          </Alert>
+        )}
 
-      {message && <p style={{ color: 'red' }}>{message}</p>}
-
-      <Link to={`/trips/${id}`}><button style={{ marginTop: '1rem' }}>← Back to Trip Detail</button></Link>
-    </div>
+        <Button
+          component={Link}
+          to={`/trips/${id}`}
+          variant="outlined"
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          ← Back to Trip Detail
+        </Button>
+      </Paper>
+    </Box>
   );
 }
 

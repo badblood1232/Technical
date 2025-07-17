@@ -2,6 +2,17 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CancelTripButton from '../component/CancelTripButton';
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  Button,
+  Alert,
+  Card,
+  CardContent,
+  Stack
+} from '@mui/material';
 
 function MyTrips() {
   const [trips, setTrips] = useState([]);
@@ -26,37 +37,70 @@ function MyTrips() {
   }, []);
 
   return (
-    <div>
-      <h2>My Hosted Trips</h2>
+    <Box sx={{ padding: 4, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+      <Paper sx={{ padding: 3, maxWidth: 1000, mx: 'auto' }}>
+        <Stack direction="row" spacing={2} alignItems="center" mb={3}>
+          <Typography variant="h4" sx={{ flexGrow: 1 }}>
+            My Hosted Trips
+          </Typography>
+          <Button component={Link} to="/trips" variant="outlined">
+            ← Back to Trip List
+          </Button>
+        </Stack>
 
-      <Link to="/trips">
-        <button style={{ marginBottom: '1rem' }}>← Back to Trip List</button>
-      </Link>
+        {message && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {message}
+          </Alert>
+        )}
 
-      {message && <p>{message}</p>}
+        {trips.length === 0 ? (
+          <Typography variant="body1">No trips found.</Typography>
+        ) : (
+          <Grid container spacing={3}>
+            {trips.filter((trip) => !trip.cancelled).map((trip) => (
+              <Grid item xs={12} md={6} key={trip.id}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {trip.title}
+                    </Typography>
 
-      {trips.length === 0 ? (
-        <p>No trips found.</p>
-      ) : (
-        trips.filter((trip) => !trip.cancelled).map((trip) => (
-          <div key={trip.id} style={{ border: '1px solid #ccc', margin: '1rem 0', padding: '1rem' }}>
-            <h3>{trip.title}</h3>
-            <p><strong>Status:</strong> {trip.status}</p>
-            <p><strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}</p>
-            <p><strong>Start:</strong> {new Date(trip.start_time).toLocaleString()}</p>
-            <p><strong>End:</strong> {new Date(trip.end_time).toLocaleString()}</p>
-            <CancelTripButton
-              tripId={trip.id}
-              onCancelSuccess={() => setTrips(trips.filter(t => t.id !== trip.id))}
-             />
-           
-            <Link to={`/trips/${trip.id}/edit`}>
-              <button>Edit</button>
-            </Link>
-          </div>
-        ))
-      )}
-    </div>
+                    <Typography variant="body2">
+                      <strong>Status:</strong> {trip.status}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Start:</strong> {new Date(trip.start_time).toLocaleString()}
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      <strong>End:</strong> {new Date(trip.end_time).toLocaleString()}
+                    </Typography>
+
+                    <Stack direction="row" spacing={1} mt={2}>
+                      <CancelTripButton
+                        tripId={trip.id}
+                        onCancelSuccess={() => setTrips(trips.filter(t => t.id !== trip.id))}
+                      />
+
+                      <Button
+                        component={Link}
+                        to={`/trips/${trip.id}/edit`}
+                        variant="outlined"
+                      >
+                        Edit
+                      </Button>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Paper>
+    </Box>
   );
 }
 
