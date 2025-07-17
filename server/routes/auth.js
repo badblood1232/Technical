@@ -8,7 +8,7 @@ require('dotenv').config();
 
 const router = express.Router();
 
-// ✅ Configure multer for BMP photo upload
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, '../public/avatars'));
@@ -29,7 +29,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
-// ✅ LOGIN route
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -56,7 +56,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ✅ REGISTER route with BMP upload
+
 router.post('/register', upload.single('photo'), async (req, res) => {
   try {
     const { username, mantra, email, password } = req.body;

@@ -7,17 +7,19 @@ import CreateTrip from './trips/CreateTrip';
 import TripList from './trips/TripList';
 import TripDetail from './trips/TripDetail';
 import MyTrips from './trips/MyTrips';
-import RequireAuth from './RequireAuth';
+import RequireAuth from './routes/RequireAuth';
 import EditTrip from './trips/EditTrip';
-
+import PublicRoute from './routes/PublicRoute';
 
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/" element={
+          <PublicRoute><Login /></PublicRoute>}/>
+        <Route path="/register" element={
+       <PublicRoute><Register /></PublicRoute>} />
         <Route path="/trips" element={
           <RequireAuth><TripList /></RequireAuth>
         } />

@@ -46,7 +46,7 @@ function TripList() {
         </Link>
     </div>
 
-      {/* ✅ Create Trip Button */}
+
       <div style={{ marginBottom: '1rem' }}>
         <Link to="/create-trip">
           <button style={{ padding: '0.5rem 1rem' }}>+ Add Trip</button>
