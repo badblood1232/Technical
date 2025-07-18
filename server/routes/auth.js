@@ -66,7 +66,7 @@ router.post('/register', upload.single('photo'), async (req, res) => {
     const { username, mantra, email, password } = req.body;
 
    
-    const photo_path = req.file ? `/avatars/${req.file.filename}` : null;
+    const photo_path = req.file ? `/uploads/${req.file.filename}` : null;
 
    
     const [check] = await db.query("SELECT id FROM users WHERE email = ?", [email]);

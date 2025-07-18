@@ -39,6 +39,10 @@ function TripDetail() {
   }, [id]);
 
   const handleJoin = async (tripId) => {
+     const confirmed = window.confirm('join this trip?');
+    if (!confirmed) {
+      return; 
+    }
     try {
       const token = localStorage.getItem('token');
       if (!token) {

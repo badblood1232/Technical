@@ -147,6 +147,9 @@ function CreateTrip() {
             InputLabelProps={{ shrink: true }}
             value={tripData.start_time}
             onChange={handleChange}
+            inputProps={{
+             max: tripData.end_time || undefined
+             }}
           />
 
           <TextField
@@ -159,6 +162,9 @@ function CreateTrip() {
             InputLabelProps={{ shrink: true }}
             value={tripData.end_time}
             onChange={handleChange}
+            inputProps={{
+            min: tripData.start_time || undefined
+             }}
           />
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>

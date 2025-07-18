@@ -63,8 +63,8 @@ function Register() {
           <TextField label="Email" name="email" type="email" fullWidth required margin="normal" value={data.email} onChange={handleChange} />
           <TextField label="Password" name="password" type="password" fullWidth required margin="normal" value={data.password} onChange={handleChange} />
           <Button variant="outlined" component="label" sx={{ mt: 2, mb: 2 }} fullWidth>
-            Upload Photo (.bmp)
-            <input type="file" name="photo" accept=".bmp" hidden onChange={handleChange} />
+            Upload Photo 
+            <input type="file" name="photo"  hidden onChange={handleChange} />
           </Button>
           <Stack spacing={2}>
             <Button variant="contained" type="submit" fullWidth>

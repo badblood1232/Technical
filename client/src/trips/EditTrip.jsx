@@ -140,6 +140,9 @@ function EditTrip() {
             InputLabelProps={{ shrink: true }}
             value={trip.start_time}
             onChange={handleChange}
+            inputProps={{
+             max: trip.end_time || undefined
+             }}
           />
           <TextField
             label="End Time"
@@ -151,6 +154,9 @@ function EditTrip() {
             InputLabelProps={{ shrink: true }}
             value={trip.end_time}
             onChange={handleChange}
+             inputProps={{
+             min: trip.start_time || undefined
+             }}
           />
           <Stack direction="row" spacing={2}>
             <TextField

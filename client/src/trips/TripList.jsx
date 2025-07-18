@@ -41,25 +41,32 @@ function TripList() {
   }, []);
 
   const handleJoin = async (tripId) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setMessage('You must be logged in to join a trip.');
-        return;
-      }
+  const confirmed = window.confirm('join this trip?');
 
-      const response = await axios.post(
-        `http://localhost:3001/api/trips/${tripId}/join`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setMessage(response.data.message);
-      await fetchTrips(); 
-    } catch (err) {
-      console.error(err);
-      setMessage(err.response?.data?.message || 'Failed to join trip.');
+  if (!confirmed) {
+    return; 
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setMessage('You must be logged in to join a trip.');
+      return;
     }
-  };
+
+    const response = await axios.post(
+      `http://localhost:3001/api/trips/${tripId}/join`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setMessage(response.data.message);
+    await fetchTrips(); 
+  } catch (err) {
+    console.error(err);
+    setMessage(err.response?.data?.message || 'Failed to join trip.');
+  }
+};
+
 
 
   return (
@@ -69,7 +76,7 @@ function TripList() {
           Trips Happening
         </Typography>
 
-        <Stack direction="row" spacing={2} mb={2}>
+        <Stack direction="row" spacing={2} mb={2} >
           <Button component={Link} to="/my-trips" variant="outlined">
             My Trips
           </Button>

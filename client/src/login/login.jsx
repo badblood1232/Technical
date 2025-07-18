@@ -38,7 +38,7 @@ function Login() {
     <Box minHeight="100vh" display="flex" justifyContent="center" alignItems="center" bgcolor="#f5f5f5">
       <Paper elevation={3} sx={{ padding: 4, width: 400 }}>
         <Typography variant="h4" textAlign="center" gutterBottom>
-          Login
+           Tripairify 
         </Typography>
         <form onSubmit={handleClick}>
           <TextField
