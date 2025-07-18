@@ -60,7 +60,7 @@ function MyTrips() {
           <Typography>No hosted trips found.</Typography>
         ) : (
           <Grid container spacing={3}>
-            {hostedTrips.filter(t => !t.cancelled).map(trip => (
+            {hostedTrips.map(trip => (
               <Grid item xs={12} md={6} key={trip.id}>
                 <Card>
                   <CardContent>
@@ -72,12 +72,16 @@ function MyTrips() {
                     <Stack direction="row" spacing={1} mt={2}>
                       <CancelTripButton
                         tripId={trip.id}
-                        onCancelSuccess={() => setHostedTrips(hostedTrips.filter(t => t.id !== trip.id))}
+                        disabled={trip.cancelled}
+                        onCancelSuccess={() =>
+                          setHostedTrips(hostedTrips.map(t => t.id === trip.id ? { ...t, cancelled: true } : t))
+                        }
                       />
                       <Button
                         component={Link}
                         to={`/trips/${trip.id}/edit`}
                         variant="outlined"
+                        disabled={trip.cancelled}
                       >
                         Edit
                       </Button>

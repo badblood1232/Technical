@@ -114,6 +114,7 @@ router.get('/joined', authMiddleware, async (req, res) => {
 });
 
 
+
 router.get('/:id', async (req, res) => {
   const tripId = req.params.id;
   try {

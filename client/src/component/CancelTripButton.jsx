@@ -1,8 +1,9 @@
-
 import axios from 'axios';
 
-function CancelTripButton({ tripId, onCancelSuccess }) {
+function CancelTripButton({ tripId, onCancelSuccess, disabled }) {
   const handleCancel = async () => {
+    if (disabled) return;
+
     const confirm = window.confirm('Are you sure you want to cancel this trip?');
     if (!confirm) return;
 
@@ -13,14 +14,25 @@ function CancelTripButton({ tripId, onCancelSuccess }) {
       });
 
       alert('Trip cancelled successfully.');
-      if (onCancelSuccess) onCancelSuccess(); 
+      if (onCancelSuccess) onCancelSuccess();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to cancel trip.');
     }
   };
 
   return (
-    <button onClick={handleCancel} style={{ backgroundColor: 'red', color: 'white' }}>
+    <button
+      onClick={handleCancel}
+      disabled={disabled}
+      style={{
+        backgroundColor: disabled ? '#ccc' : 'red',
+        color: disabled ? '#666' : 'white',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        border: 'none',
+        padding: '8px 12px',
+        borderRadius: '4px'
+      }}
+    >
       Cancel Trip
     </button>
   );

@@ -51,6 +51,9 @@ function JoinedTrips() {
                 <Typography variant="body2"><strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}</Typography>
                 <Typography variant="body2"><strong>Start:</strong> {new Date(trip.start_time).toLocaleString()}</Typography>
                 <Typography variant="body2"><strong>End:</strong> {new Date(trip.end_time).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: trip.cancelled ? 'red' : 'inherit' }}>
+                 {trip.cancelled ? 'This trip was cancelled.' : ''}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
