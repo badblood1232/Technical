@@ -11,19 +11,22 @@ const router = express.Router();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../public/avatars'));
+    cb(null, path.join(__dirname, '../public/uploads'));
   },
   filename: (req, file, cb) => {
-    const uniqueName = `user_${Date.now()}.bmp`;
-    cb(null, uniqueName);
+    const ext = path.extname(file.originalname); 
+    const safeName = `user_${Date.now()}${ext}`;
+    cb(null, safeName);
   }
 });
 
+
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/bmp') {
+  const allowedTypes = ['image/bmp', 'image/png', 'image/jpeg'];
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only BMP files are allowed'), false);
+    cb(new Error('Only .bmp, .png, and .jpeg files are allowed'), false);
   }
 };
 
@@ -41,6 +44,7 @@ router.post('/login', async (req, res) => {
     if (!valid) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET);
+
     res.json({
       token,
       user: {
@@ -60,13 +64,17 @@ router.post('/login', async (req, res) => {
 router.post('/register', upload.single('photo'), async (req, res) => {
   try {
     const { username, mantra, email, password } = req.body;
+
+   
     const photo_path = req.file ? `/avatars/${req.file.filename}` : null;
 
+   
     const [check] = await db.query("SELECT id FROM users WHERE email = ?", [email]);
     if (check.length > 0) {
       return res.status(400).json({ message: 'Email already in use' });
     }
 
+   
     const hash = await bcrypt.hash(password, 10);
     await db.query(
       "INSERT INTO users (username, mantra, email, password_hash, photo_path) VALUES (?, ?, ?, ?, ?)",

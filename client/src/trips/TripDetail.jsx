@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import MapEmbed from '../component/MapEmbed';
 import JoinButton from '../component/JoinButton';
+import TripPeopleSection from './TripPeopleSection';
+
 import {
   Box,
   Typography,
@@ -107,6 +109,12 @@ function TripDetail() {
           <Typography variant="body1" mb={2}>
             <strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}
           </Typography>
+          <TripPeopleSection
+            host_name={trip.host_name}
+            host_photo={trip.host_photo}
+            joiners={trip.joiners}
+          />
+
 
           <MapEmbed latitude={trip.latitude} longitude={trip.longitude} />
           <JoinButton trip={trip} onJoin={handleJoin} />

@@ -4,6 +4,7 @@ import axios from 'axios';
 import LogoutButton from '../component/LogoutButton';
 import MapEmbed from '../component/MapEmbed';
 import JoinButton from '../component/JoinButton';
+
 import {
   Box,
   Typography,
@@ -53,7 +54,7 @@ function TripList() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMessage(response.data.message);
-      await fetchTrips();  // <--- refresh data here
+      await fetchTrips(); 
     } catch (err) {
       console.error(err);
       setMessage(err.response?.data?.message || 'Failed to join trip.');
@@ -65,7 +66,7 @@ function TripList() {
     <Box sx={{ padding: 4, bgcolor: '#f9f9f9', minHeight: '100vh' }}>
       <Paper sx={{ padding: 3, mb: 3 }}>
         <Typography variant="h4" gutterBottom>
-          All Trips
+          Trips Happening
         </Typography>
 
         <Stack direction="row" spacing={2} mb={2}>
@@ -98,7 +99,7 @@ function TripList() {
                 <Box display="flex" alignItems="center" mb={1}>
                   {trip.host_photo && (
                     <Avatar
-                      src={`http://localhost:3001/${trip.photo_path}`}
+                      src={`http://localhost:3001/${trip.host_photo}`}
                       alt="Host"
                       sx={{ width: 40, height: 40, mr: 1 }}
                     />

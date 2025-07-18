@@ -115,6 +115,31 @@ router.get('/joined', authMiddleware, async (req, res) => {
 
 
 
+
+
+router.post('/', authMiddleware, async (req, res) => {
+  try {
+    const host_id = req.user.id;
+    const {
+      title, briefer, cover_photo, destination_name,
+      latitude, longitude, start_time, end_time,
+      min_heads, max_heads
+    } = req.body;
+
+    const [result] = await db.query(
+      `INSERT INTO trips 
+        (title, briefer, cover_photo, destination_name, latitude, longitude, start_time, end_time, min_heads, max_heads, current_heads, cancelled, host_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, false, ?)`,
+      [title, briefer, cover_photo, destination_name, latitude, longitude, start_time, end_time, min_heads, max_heads, host_id]
+    );
+
+    res.status(201).json({ message: 'Trip created', tripId: result.insertId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   const tripId = req.params.id;
   try {
@@ -146,6 +171,7 @@ router.get('/:id', async (req, res) => {
     trip.status = computeTripStatus(trip);
     trip.is_host = userId === trip.host_id;
 
+    // Check if user already joined
     if (userId) {
       const [joined] = await db.query(
         'SELECT 1 FROM trip_participants WHERE user_id = ? AND trip_id = ?',
@@ -156,6 +182,17 @@ router.get('/:id', async (req, res) => {
       trip.already_joined = false;
     }
 
+    // ✅ Get list of joiners
+    const [joiners] = await db.query(
+      `SELECT users.id, users.username, users.photo_path
+       FROM trip_participants
+       JOIN users ON trip_participants.user_id = users.id
+       WHERE trip_participants.trip_id = ?`,
+      [tripId]
+    );
+
+    trip.joiners = joiners; // 🔁 include joiners
+
     res.json(trip);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -163,28 +200,6 @@ router.get('/:id', async (req, res) => {
 });
 
 
-router.post('/', authMiddleware, async (req, res) => {
-  try {
-    const host_id = req.user.id;
-    const {
-      title, briefer, cover_photo, destination_name,
-      latitude, longitude, start_time, end_time,
-      min_heads, max_heads
-    } = req.body;
-
-    const [result] = await db.query(
-      `INSERT INTO trips 
-        (title, briefer, cover_photo, destination_name, latitude, longitude, start_time, end_time, min_heads, max_heads, current_heads, cancelled, host_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, false, ?)`,
-      [title, briefer, cover_photo, destination_name, latitude, longitude, start_time, end_time, min_heads, max_heads, host_id]
-    );
-
-    res.status(201).json({ message: 'Trip created', tripId: result.insertId });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: err.message });
-  }
-});
 
 
 router.post('/:id/cancel', authMiddleware, async (req, res) => {
