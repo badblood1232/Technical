@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import LogoutButton from '../component/LogoutButton';
 import MapEmbed from '../component/MapEmbed';
+import JoinButton from '../component/JoinButton';
 import {
   Box,
   Typography,
@@ -50,7 +51,7 @@ function TripList() {
       setMessage(err.response?.data?.message || 'Failed to join trip');
     }
   };
-
+  
   return (
     <Box sx={{ padding: 4, bgcolor: '#f9f9f9', minHeight: '100vh' }}>
       <Paper sx={{ padding: 3, mb: 3 }}>
@@ -67,13 +68,11 @@ function TripList() {
           </Button>
           <LogoutButton />
         </Stack>
-
         {message && (
           <Alert severity="info" sx={{ mb: 2 }}>
             {message}
           </Alert>
         )}
-
         <Grid container spacing={3}>
           {trips.map((trip) => (
             <Grid item xs={12} md={6} lg={4} key={trip.id}>
@@ -99,15 +98,12 @@ function TripList() {
                       Hosted by: {trip.host_name || 'Unknown'}
                     </Typography>
                   </Box>
-
                   <Typography variant="h6" component={Link} to={`/trips/${trip.id}`} style={{ textDecoration: 'none', color: '#1976d2' }}>
                     {trip.title}
                   </Typography>
-
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     {trip.briefer}
                   </Typography>
-
                   <Typography variant="body2">
                     <strong>Destination:</strong> {trip.destination_name}
                   </Typography>
@@ -121,27 +117,9 @@ function TripList() {
                   </Typography>
                   <Typography variant="body2" gutterBottom>
                     <strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}
-                  </Typography>
-
-                 
+                  </Typography>        
                   <MapEmbed latitude={trip.latitude} longitude={trip.longitude} />
-
-                  <Box mt={2}>
-                    {trip.status === 'Upcoming' && trip.current_heads < trip.max_heads ? (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        onClick={() => handleJoin(trip.id)}
-                      >
-                        Join
-                      </Button>
-                    ) : (
-                      <Button variant="outlined" disabled fullWidth>
-                        {trip.status === 'Full' ? 'Full' : 'Closed'}
-                      </Button>
-                    )}
-                  </Box>
+                 <JoinButton trip={trip} onJoin={handleJoin} />
                 </CardContent>
               </Card>
             </Grid>

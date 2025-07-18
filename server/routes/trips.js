@@ -8,13 +8,14 @@ const db = require('../db');
 const computeTripStatus = (trip) => {
   const now = new Date();
   const start = new Date(trip.start_time);
+  const end = new Date(trip.end_time);
 
   if (trip.cancelled) return 'Cancelled';
   if (trip.current_heads >= trip.max_heads) return 'Full';
-  if (now >= start) return 'Concluded';
+  if (now > end) return 'Concluded';
+  if (now >= start) return 'Ongoing';
   return 'Upcoming';
-};
-
+}                                                                                                                                                                                            
 router.get('/', async (req, res) => {
   try {
     const [trips] = await db.query(`

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import MapEmbed from '../component/MapEmbed';
+import JoinButton from '../component/JoinButton';
 import {
   Box,
   Typography,
@@ -19,7 +20,7 @@ function TripDetail() {
   const [trip, setTrip] = useState(null);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchTrip = async () => {
       try {
         const res = await axios.get(`http://localhost:3001/api/trips/${id}`);
@@ -33,18 +34,16 @@ function TripDetail() {
     fetchTrip();
   }, [id]);
 
-  const handleJoin = async () => {
+   const handleJoin = async (tripId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        setMessage('Please log in to join this trip.');
+        setMessage('You must be logged in to join a trip.');
         return;
       }
-
-      await axios.post(`http://localhost:3001/api/trips/${id}/join`, {}, {
+      await axios.post(`http://localhost:3001/api/trips/${tripId}/join`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
       setMessage('Successfully joined the trip!');
     } catch (err) {
       console.error(err);
@@ -88,7 +87,6 @@ function TripDetail() {
             sx={{ objectFit: 'cover', borderRadius: 1, mb: 2 }}
           />
         )}
-
         <CardContent>
           <Typography variant="body1"><strong>Destination:</strong> {trip.destination_name}</Typography>
           <Typography variant="body1"><strong>Coordinates:</strong> {trip.latitude}, {trip.longitude}</Typography>
@@ -99,22 +97,8 @@ function TripDetail() {
           <Typography variant="body1" mb={2}>
             <strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}
           </Typography>
-
-          {/* Embedded Map */}
           <MapEmbed latitude={trip.latitude} longitude={trip.longitude} />
-
-          <Box mt={3}>
-            {trip.status === 'Upcoming' && trip.current_heads < trip.max_heads ? (
-              <Button variant="contained" fullWidth onClick={handleJoin}>
-                Join Trip
-              </Button>
-            ) : (
-              <Button variant="outlined" fullWidth disabled>
-                {trip.status === 'Full' ? 'Full' : 'Closed'}
-              </Button>
-            )}
-          </Box>
-
+          <JoinButton trip={trip} onJoin={handleJoin} />
           {message && (
             <Alert severity="info" sx={{ mt: 2 }}>
               {message}
