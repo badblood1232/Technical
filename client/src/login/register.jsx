@@ -7,6 +7,7 @@ function Register() {
   const [data, setData] = useState({ username: '', mantra: '', email: '', password: '', photo: null });
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+  const [registered, setRegistered] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -40,9 +41,9 @@ function Register() {
 
       await axios.post('http://localhost:3001/api/register', formData);
 
-      setMessage('Registration successful!');
-      setData({ username: '', mantra: '', email: '', password: '', photo: null });
-      navigate('/');
+     // setMessage('Registration successful!');
+      setRegistered(true);
+      setTimeout(() => navigate('/'), 1500);
     } catch (err) {
       const msg = err.response?.data?.message || 'Registration failed';
       setMessage(msg);
@@ -83,6 +84,11 @@ function Register() {
           <Alert severity={isError ? 'error' : 'success'} sx={{ mt: 2 }}>
             {message}
           </Alert>
+        )}
+        {registered && (
+          <Typography variant="h6" textAlign="center" gutterBottom sx={{ mt: 2 }}>
+            Registered successfully! Redirecting in 1.5 seconds...
+          </Typography>
         )}
       </Paper>
     </Box>
