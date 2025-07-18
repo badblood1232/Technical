@@ -4,27 +4,27 @@ import { Button, Box } from '@mui/material';
 
 const JoinButton = ({ trip, onJoin }) => {
   const isUpcoming = trip.status === 'Upcoming' && trip.current_heads < trip.max_heads;
-  const isOngoing = trip.status === 'Ongoing';
   const isFull = trip.status === 'Full';
+  const isDisabled = trip.is_host || trip.already_joined || !isUpcoming;
+
+  let label = 'Join';
+  if (trip.is_host) label = 'You are the Host';
+  else if (trip.already_joined) label = 'Already Joined';
+  else if (isFull) label = 'Full';
+  else if (!isUpcoming) label = 'Closed';
 
   return (
     <Box mt={2}>
-      {isUpcoming ? (
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={() => onJoin(trip.id)}
-        >
-          Join
-        </Button>
-      ) : isOngoing ? null : (
-        <Button variant="outlined" disabled fullWidth>
-          {isFull ? 'Full' : 'Closed'}
-        </Button>
-      )}
+      <Button
+        variant={isDisabled ? "outlined" : "contained"}
+        color="primary"
+        fullWidth
+        onClick={() => !isDisabled && onJoin(trip.id)}
+        disabled={isDisabled}
+      >
+        {label}
+      </Button>
     </Box>
   );
 };
-
 export default JoinButton;

@@ -22,16 +22,20 @@ function TripList() {
   const [trips, setTrips] = useState([]);
   const [message, setMessage] = useState('');
 
+  const fetchTrips = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:3001/api/trips', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTrips(res.data);
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to load trips');
+    }
+  };
+
   useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const res = await axios.get('http://localhost:3001/api/trips');
-        setTrips(res.data);
-      } catch (err) {
-        console.error(err);
-        setMessage('Failed to load trips');
-      }
-    };
     fetchTrips();
   }, []);
 
@@ -42,16 +46,21 @@ function TripList() {
         setMessage('You must be logged in to join a trip.');
         return;
       }
-      await axios.post(`http://localhost:3001/api/trips/${tripId}/join`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMessage('Successfully joined the trip!');
+
+      const response = await axios.post(
+        `http://localhost:3001/api/trips/${tripId}/join`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage(response.data.message);
+      await fetchTrips();  // <--- refresh data here
     } catch (err) {
       console.error(err);
-      setMessage(err.response?.data?.message || 'Failed to join trip');
+      setMessage(err.response?.data?.message || 'Failed to join trip.');
     }
   };
-  
+
+
   return (
     <Box sx={{ padding: 4, bgcolor: '#f9f9f9', minHeight: '100vh' }}>
       <Paper sx={{ padding: 3, mb: 3 }}>

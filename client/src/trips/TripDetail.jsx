@@ -7,7 +7,6 @@ import {
   Box,
   Typography,
   Button,
-  Card,
   CardContent,
   CardMedia,
   Alert,
@@ -20,31 +19,41 @@ function TripDetail() {
   const [trip, setTrip] = useState(null);
   const [message, setMessage] = useState('');
 
-   useEffect(() => {
-    const fetchTrip = async () => {
-      try {
-        const res = await axios.get(`http://localhost:3001/api/trips/${id}`);
-        setTrip(res.data);
-      } catch (err) {
-        console.error(err);
-        setMessage('Failed to load trip details');
-      }
-    };
+  const fetchTrip = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`http://localhost:3001/api/trips/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTrip(res.data);
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to load trip details');
+    }
+  };
 
+  useEffect(() => {
     fetchTrip();
   }, [id]);
 
-   const handleJoin = async (tripId) => {
+  const handleJoin = async (tripId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         setMessage('You must be logged in to join a trip.');
         return;
       }
-      await axios.post(`http://localhost:3001/api/trips/${tripId}/join`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+
+      await axios.post(
+        `http://localhost:3001/api/trips/${tripId}/join`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       setMessage('Successfully joined the trip!');
+      await fetchTrip(); // refresh trip data to update button
     } catch (err) {
       console.error(err);
       setMessage(err.response?.data?.message || 'Failed to join trip');
@@ -87,6 +96,7 @@ function TripDetail() {
             sx={{ objectFit: 'cover', borderRadius: 1, mb: 2 }}
           />
         )}
+
         <CardContent>
           <Typography variant="body1"><strong>Destination:</strong> {trip.destination_name}</Typography>
           <Typography variant="body1"><strong>Coordinates:</strong> {trip.latitude}, {trip.longitude}</Typography>
@@ -97,6 +107,7 @@ function TripDetail() {
           <Typography variant="body1" mb={2}>
             <strong>Participants:</strong> {trip.current_heads} / {trip.max_heads}
           </Typography>
+
           <MapEmbed latitude={trip.latitude} longitude={trip.longitude} />
           <JoinButton trip={trip} onJoin={handleJoin} />
           {message && (
