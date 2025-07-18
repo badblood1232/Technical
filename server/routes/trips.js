@@ -86,6 +86,33 @@ router.get('/my', authMiddleware, async (req, res) => {
   }
 });
 
+router.get('/joined', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [joinedTrips] = await db.query(
+      `
+      SELECT t.*
+      FROM trips t
+      INNER JOIN trip_participants tp ON t.id = tp.trip_id
+      WHERE tp.user_id = ?
+      ORDER BY t.start_time DESC
+      `,
+      [userId]
+    );
+
+    const tripsWithStatus = joinedTrips.map((trip) => ({
+      ...trip,
+      status: computeTripStatus(trip)
+    }));
+
+    res.json(tripsWithStatus);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 router.get('/:id', async (req, res) => {
   const tripId = req.params.id;
@@ -177,6 +204,8 @@ router.post('/:id/cancel', authMiddleware, async (req, res) => {
 });
 
 
+
+
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const hostId = req.user.id;
@@ -208,6 +237,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+
 
 
 router.post('/:tripId/join', authMiddleware, async (req, res) => {
